@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name=".circleci">
+      </df>
+      <df name="3rdparty">
+        <df name="dll">
+          <df name="x64">
+          </df>
+          <df name="x86">
+          </df>
+        </df>
+        <df name="include">
+          <in>pthread.h</in>
+          <in>sched.h</in>
+          <in>semaphore.h</in>
+        </df>
+        <df name="lib">
+          <df name="x64">
+          </df>
+          <df name="x86">
+          </df>
+        </df>
+      </df>
+      <df name="backup">
+      </df>
+      <df name="cfg">
+        <df name="yolov1">
+        </df>
+      </df>
+      <df name="data">
+        <df name="img">
+        </df>
+        <df name="img_old">
+        </df>
+        <df name="labels">
+        </df>
+        <df name="학습결과">
+        </df>
+      </df>
+      <df name="files">
+        <df name="0">
+        </df>
+      </df>
+      <df name="log">
+      </df>
+      <df name="obj">
+      </df>
+      <df name="results">
+      </df>
+      <df name="scripts">
+        <in>kmeansiou.c</in>
+      </df>
+      <df name="src">
+        <in>activation_layer.c</in>
+        <in>activation_layer.h</in>
+        <in>activations.c</in>
+        <in>activations.h</in>
+        <in>avgpool_layer.c</in>
+        <in>avgpool_layer.h</in>
+        <in>batchnorm_layer.c</in>
+        <in>batchnorm_layer.h</in>
+        <in>blas.c</in>
+        <in>blas.h</in>
+        <in>box.c</in>
+        <in>box.h</in>
+        <in>classifier.c</in>
+        <in>classifier.h</in>
+        <in>col2im.c</in>
+        <in>col2im.h</in>
+        <in>connected_layer.c</in>
+        <in>connected_layer.h</in>
+        <in>convolutional_layer.c</in>
+        <in>convolutional_layer.h</in>
+        <in>cost_layer.c</in>
+        <in>cost_layer.h</in>
+        <in>cpu_gemm.c</in>
+        <in>crnn_layer.c</in>
+        <in>crnn_layer.h</in>
+        <in>crop_layer.c</in>
+        <in>crop_layer.h</in>
+        <in>cuda.c</in>
+        <in>cuda.h</in>
+        <in>darknet.c</in>
+        <in>data.c</in>
+        <in>data.h</in>
+        <in>deconvolutional_layer.c</in>
+        <in>deconvolutional_layer.h</in>
+        <in>demo.c</in>
+        <in>demo.h</in>
+        <in>detection_layer.c</in>
+        <in>detection_layer.h</in>
+        <in>detector.c</in>
+        <in>dropout_layer.c</in>
+        <in>dropout_layer.h</in>
+        <in>gemm.c</in>
+        <in>gemm.h</in>
+        <in>getopt.c</in>
+        <in>getopt.h</in>
+        <in>gettimeofday.c</in>
+        <in>gettimeofday.h</in>
+        <in>gru_layer.c</in>
+        <in>gru_layer.h</in>
+        <in>http_stream.cpp</in>
+        <in>http_stream.h</in>
+        <in>im2col.c</in>
+        <in>im2col.h</in>
+        <in>image.c</in>
+        <in>image.h</in>
+        <in>layer.c</in>
+        <in>layer.h</in>
+        <in>list.c</in>
+        <in>list.h</in>
+        <in>local_layer.c</in>
+        <in>local_layer.h</in>
+        <in>matrix.c</in>
+        <in>matrix.h</in>
+        <in>maxpool_layer.c</in>
+        <in>maxpool_layer.h</in>
+        <in>network.c</in>
+        <in>network.h</in>
+        <in>normalization_layer.c</in>
+        <in>normalization_layer.h</in>
+        <in>option_list.c</in>
+        <in>option_list.h</in>
+        <in>parser.c</in>
+        <in>parser.h</in>
+        <in>region_layer.c</in>
+        <in>region_layer.h</in>
+        <in>reorg_layer.c</in>
+        <in>reorg_layer.h</in>
+        <in>reorg_old_layer.c</in>
+        <in>reorg_old_layer.h</in>
+        <in>rnn_layer.c</in>
+        <in>rnn_layer.h</in>
+        <in>route_layer.c</in>
+        <in>route_layer.h</in>
+        <in>server.c</in>
+        <in>server.h</in>
+        <in>shortcut_layer.c</in>
+        <in>shortcut_layer.h</in>
+        <in>softmax_layer.c</in>
+        <in>softmax_layer.h</in>
+        <in>stb_image.h</in>
+        <in>stb_image_write.h</in>
+        <in>traffic.c</in>
+        <in>traffic.h</in>
+        <in>tree.c</in>
+        <in>tree.h</in>
+        <in>unistd.h</in>
+        <in>utils.c</in>
+        <in>utils.h</in>
+        <in>yolo_console_dll.cpp</in>
+        <in>yolo_v2_class.cpp</in>
+        <in>yolo_v2_class.hpp</in>
+      </df>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+            <option name="debug_command" value="./darknet test backup/yolo-obj_600.weights"/>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>./darknet test backup/yolo-obj_600.weights</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>./darknet test backup/yolo-obj_600.weights</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

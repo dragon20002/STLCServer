@@ -4,6 +4,7 @@
 *.out
 *.png
 *.so
+backup/
 mnist/
 data/
 caffe/
@@ -16,6 +17,8 @@ submission/
 cfg/
 darknet
 .fuse*
+darknet19_448.conv.23
+
 
 # OS Generated #
 .DS_Store*
