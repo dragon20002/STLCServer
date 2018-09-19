@@ -7,9 +7,8 @@
 #define BUFSIZE 513 //메세지 버퍼크기
 #define MTUSIZE 512 //메세지 전송단위
 #define NUM_OF_CLI 4
-//#define WEB_URL 
 #define PORT "50000"
-#define WEB_URL "http://13.125.115.128:8080/STLC/upload"
+#define WEB_URL "http://13.209.87.196:8080/STLC/upload"
 //#define WEB_URL "http://localhost:8080/STLC/upload"
 #define FILE_DIR "files"   //"/var/lib/tomcat8/webapps/STLC/resources/files"
 #define STREAM_FPS 1

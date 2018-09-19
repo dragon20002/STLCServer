@@ -1183,7 +1183,7 @@ void test_night_detector(char *datacfg, char *cfgfile, char *weightfile,
     srand(2222222);
 
     // server on port "50000"
-    run_server("50000");
+    run_server(PORT);
     while (1) {
         int i;
 
