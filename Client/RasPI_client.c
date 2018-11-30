@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
 		return 0;
 
     for (i = 0; i < NUM_OF_LED; i++)
-        pinMode(leds[i], OUTPUT);
+        pinMode(leds[i], 1);
 #endif //PI
 
     // Set picture name
