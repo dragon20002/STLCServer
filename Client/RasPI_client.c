@@ -225,6 +225,7 @@ void error_handler(char * message) {
 }
 
 void set_red() {
+	int i;
 	for (i = 0; i < NUM_OF_LED; i++) {
 #ifdef PI
 		digitalWrite(leds[i], 0);
