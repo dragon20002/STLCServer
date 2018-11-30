@@ -31,6 +31,7 @@ int recv_message(int sock, char* message);
 int send_image(int sock, char* message);
 void* sig_handler(int signo);
 void error_handler(char * message);
+void set_red();
 
 int main(int argc, char **argv) {
     int i;
@@ -76,6 +77,7 @@ int main(int argc, char **argv) {
 
     close(sock);
 	printf("server connection off\n");
+	set_red();
 
     return 0;
 }
@@ -215,13 +217,8 @@ void* sig_handler(int signo) {
 			if (recv_message(sock, message) == 0 || strstr(message, "OK")) {
 				close(sock);
 
-#ifdef PI
-				digitalWrite(leds[3], 1);
-#else
-				printf("%d is %d\n", leds[3], 1);
-#endif //PI
-
 				printf("\nconnection off\n");
+				set_red();
 				exit(0);
 			}
         default:
@@ -231,13 +228,14 @@ void* sig_handler(int signo) {
 
 void error_handler(char * message) {
     perror(message);
+	set_red();
+	exit(0);
+}
 
-
+void set_red() {
 #ifdef PI
 				digitalWrite(leds[3], 1);
 #else
 				printf("%d is %d\n", leds[3], 1);
 #endif //PI
-
-	exit(0);
 }
