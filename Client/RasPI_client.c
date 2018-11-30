@@ -120,46 +120,8 @@ void connection(int sock) {
 #endif //PI
 		}
 
-		//milisec = (1 / sleep_time) - (clock() - time) / CLOCKS_PER_SEC;
-		//if (milisec > 0)
-		//	usleep(milisec * 1000); //usec
 		sleep(1);
 	}
-	/*
-	while ((msg_size = recv_message(sock, message)) != 0) {
-		if (strstr(message, "/recv_image") != NULL) { //trans seq:1 (start)
-			// capture
-			sprintf(message, "raspistill -o %s.jpg -t 1 -w 416 -h 416 -vf", name);
-
-#ifdef PI
-			if (popen(message, "r") == NULL) {
-				send_message(sock, "NOK", 3); //trans seq:2 NOK
-				break;
-			}
-#endif //PI
-
-			// upload image
-			if (send_image(sock, message) == -1)
-				break;
-		}
-		else if (strstr(message, "/set_led") != NULL) {
-			int i;
-			char cmd_line[BUFSIZE];
-			int isOn[NUM_OF_LED] = { 0, };
-			sscanf(message, "%s %d %d %d %d",
-				   	cmd_line, &isOn[0], &isOn[1], &isOn[2], &isOn[3]);
-			for(i = 0; i < NUM_OF_LED; i++) {
-#ifdef PI
-				digitalWrite(leds[i], isOn[i]);
-#else
-				printf("%d is %d\n", leds[i], isOn[i]);
-#endif //PI
-			}
-			send_message(sock, "OK", 2);
-		}
-
-	} //WHILE (msg_size!=0)
-	*/
 }
 
 void send_message(int sock, char* message, int msg_size) {
@@ -249,15 +211,16 @@ void* sig_handler(int signo) {
 #endif //PI
 			}
 
+			send_message(sock, "/exit", 5);
+			if (recv_message(sock, message) == 0 || strstr(message, "OK")) {
+				close(sock);
+
 #ifdef PI
 				digitalWrite(leds[3], 1);
 #else
 				printf("%d is %d\n", leds[3], 1);
 #endif //PI
 
-			send_message(sock, "/exit", 5);
-			if (recv_message(sock, message) == 0 || strstr(message, "OK")) {
-				close(sock);
 				printf("\nconnection off\n");
 				exit(0);
 			}
@@ -268,5 +231,13 @@ void* sig_handler(int signo) {
 
 void error_handler(char * message) {
     perror(message);
+
+
+#ifdef PI
+				digitalWrite(leds[3], 1);
+#else
+				printf("%d is %d\n", leds[3], 1);
+#endif //PI
+
 	exit(0);
 }
