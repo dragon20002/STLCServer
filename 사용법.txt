@@ -38,7 +38,7 @@
 
 
 #실행
-./darknet test backup/yolo-obj_1500.weights
+./darknet test backup/yolo-obj_5200.weights 0
 
 
 #실행결과 이미지 위치

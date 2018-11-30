@@ -1154,195 +1154,250 @@ int isImage(char* filename) {
     return src != 0;
 }
 
-void test_night_detector(char *datacfg, char *cfgfile, char *weightfile,
-        float thresh) {
-    list *options = read_data_cfg(datacfg);
-    char *name_list = option_find_str(options, "names", "data/names.list");
-    char **names = get_labels(name_list);
-    image **alphabet = load_alphabet();
-    network net = parse_network_cfg_custom(cfgfile, 1);
+time_t traffic_time = -1;
+time_t orange_time = -1;
+int myswitch = 0;
+int old_switch = 0;
+int calc_time = 0;
 
-    time_t current_time;
-    time_t traffic_time = -1;
-    time_t orange_time = -1;
-    int myswitch = 0;
-    int old_switch = 0;
+void traffic_normal_mode(int default_time, int default_orange) {
+    int i;
+    int accident, remain_time, total_time;
+    
+    if ((time(NULL) - traffic_time > default_time + calc_time) || (traffic_time == -1)) {
+        int EW_Max, NS_Max;
+    
+        pthread_mutex_lock(&conn_mutex);
 
-    int EW_Max;
-    int NS_Max;
+        EW_Max = east.front + west.front;
+        NS_Max = north.front + south.front;
 
-    int default_time = 0;
-    int default_orange = 3; // default orange time
-    int calc_time = 0;
-    int accident = 0;
-
-    if (weightfile) {
-        load_weights(&net, weightfile);
-    }
-    set_batch_network(&net, 1);
-    srand(2222222);
-
-    // server on port "50000"
-    run_server(PORT);
-    while (1) {
-        int i;
-
-        // Request Images
-
-        // Detect Images
-        current_time = time(NULL);
-        for (i = 0; i < NUM_OF_CLI; i++) {
-            pthread_mutex_lock(&conn_mutex);
-            if (tls[i]) {
-                tls[i]->front = 0;
-                tls[i]->back = 0;
-                tls[i]->side = 0;
-                tls[i]->accident = 0;
-
-                pthread_mutex_lock(&tls[i]->mutex);
-                get_detect_result(tls[i], thresh, names, alphabet, net);
+        for (i = 0; i < NUM_OF_CLI; i++)
+            if (tls[i] != NULL)
                 writeTrafficLightInfo(tls[i]);
-                pthread_mutex_unlock(&tls[i]->mutex);
-            }
-            pthread_mutex_unlock(&conn_mutex);
-        }
-        printf("[DETECT] 이미지 분석 완료 (%.2f 초)\n", time(NULL) - current_time);
 
-        // Traffic Algorithm
-        current_time = time(NULL);
+        // 주황불 시간 결정
+        if ((time(NULL) - orange_time > default_orange)
+                || (orange_time == -1)) {
 
+            switch (myswitch) {
+                case 0:
+                    //North South Green
+                    //East West Red
+                    calc_time = 3 * (NS_Max - EW_Max);
 
-        if ((time(NULL) - traffic_time > default_time)
-                || (traffic_time == -1)) {
+                    green_light(&north);
+                    green_light(&south);
+                    red_light(&east);
+                    red_light(&west);
 
-            pthread_mutex_lock(&conn_mutex);
-
-            EW_Max = east.front + west.front;
-            NS_Max = north.front + south.front;
-
-            for (i = 0; i < NUM_OF_CLI; i++)
-                if (tls[i] != NULL)
-                    writeTrafficLightInfo(tls[i]);
-
-            if ((time(NULL) - orange_time > default_orange)
-                    || (orange_time == -1)) {
-
-                switch (myswitch) {
-                    case 0:
-                        //North South Green
-                        //East West Red
-
-                        green_light(&north);
-                        green_light(&south);
-                        red_light(&east);
-                        red_light(&west);
-                        if (EW_Max >= 2) {
-                            myswitch++;
-                            old_switch = myswitch;
-                            myswitch = 2;
-                        }
-                        break;
-
-                    case 1:
-                        //North South Red
-                        //East West Green
-                        //없는쪽 신호시간
-                        default_time = 10;
-
-                        red_light(&north);
-                        red_light(&south);
-                        green_light(&east);
-                        green_light(&west);
-
-                        myswitch = 0;
-                        old_switch = myswitch;
-                        myswitch = 2;
-
-                        break;
-
-                    case 2:
-                        // orange
-                        orange_light(&east);
-                        orange_light(&west);
-                        orange_light(&south);
-                        orange_light(&north);
-
-                        orange_time = time(NULL);
-                        myswitch = old_switch;
-
-                        if (default_time > 0)
-                            default_time = 0;
-
-                        //myswitch = oldswitch;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (calc_time < 0)
-                calc_time = 0;
-            else if (calc_time > 40)
-                calc_time = 40;
-
-            // 신호등 정보 저장
-            for (i = 0; i < NUM_OF_CLI; i++)
-                if (tls[i] != NULL)
-                    writeTrafficLightInfo(tls[i]);
-
-            // 사고 여부 결정
-            accident = 0;
-            for (i = 0; i < NUM_OF_CLI; i++) {
-                if (tls[i] != NULL && tls[i]->accident == 1) {
-                    accident = 1;
+                    myswitch++;
+                    old_switch = myswitch;
+                    myswitch = 4;
                     break;
-                }
+
+                case 1:
+                    //North South Left Green
+                    //East West Red
+                    calc_time = 3 * (NS_Max - EW_Max);
+
+                    green_left_light(&north);
+                    green_left_light(&south);
+                    red_light(&east);
+                    red_light(&west);
+
+                    myswitch++;
+                    old_switch = myswitch;
+                    myswitch = 4;
+                    break;
+
+                case 2:
+                    //North South Red
+                    //East West Green
+                    calc_time = 3 * (EW_Max - NS_Max);
+
+                    red_light(&north);
+                    red_light(&south);
+                    green_light(&east);
+                    green_light(&west);
+
+                    myswitch++;
+                    old_switch = myswitch;
+                    myswitch = 4;
+                    break;
+                case 3:
+                    //North South Red
+                    //East West Left Green
+                    calc_time = 3 * (EW_Max - NS_Max);
+
+                    red_light(&north);
+                    red_light(&south);
+                    green_left_light(&east);
+                    green_left_light(&west);
+
+                    myswitch = 0;
+                    old_switch = myswitch;
+                    myswitch = 4;
+                    break;
+                case 4:
+                    // orange
+                    orange_light(&east);
+                    orange_light(&west);
+                    orange_light(&south);
+                    orange_light(&north);
+
+                    orange_time = time(NULL);
+                    myswitch = old_switch;
+                    break;
+                default:
+                    break;
             }
+        }
+        if (calc_time < -5)
+            calc_time = -5;
+        else if (calc_time > 10)
+            calc_time = 10;
 
-            pthread_mutex_unlock(&conn_mutex);
+        // 신호등 정보 저장
+
+        for (i = 0; i < NUM_OF_CLI; i++)
+            if (tls[i] != NULL)
+                writeTrafficLightInfo(tls[i]);
+
+        // 사고 여부 결정
+        accident = 0;
+        for (i = 0; i < NUM_OF_CLI; i++) {
+            if (tls[i] != NULL && tls[i]->accident == 1) {
+                accident = 1;
+                break;
+            }
+        }
+
+        if (myswitch == 4)
             traffic_time = time(NULL);
-        }
-        if (default_time - (time(NULL) - traffic_time) < 0) {
-            printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n",
-                    0, default_time);
-            writeGlobalInfo(accident, 0, default_time);
-        } else {
-            printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n",
-                    default_time - (time(NULL) - traffic_time),
-                    default_time);
-
-            writeGlobalInfo(accident,
-                    default_time - (time(NULL) - traffic_time),
-                    default_time);
-        }
-        printf("[DETECT] 신호등 신호 전달 완료 (%.2f 초)\n", time(NULL) - current_time);
-        printf("------------------------------------------------\n");
-
-        // Request set LED
-
-        usleep(300);
+        pthread_mutex_unlock(&conn_mutex);
     }
+    
+    if (myswitch == 4) {
+        remain_time = default_time + calc_time - time(NULL) + traffic_time;
+        total_time = default_time + calc_time;
+    } else {
+        remain_time = default_orange - (time(NULL) - orange_time);
+        total_time = default_orange;
+    }
+    writeGlobalInfo(accident, remain_time, total_time);
+    printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n", remain_time, total_time);
 }
 
-void test_detector(char *datacfg, char *cfgfile, char *weightfile,
-        float thresh) {
+void traffic_night_mode(int default_time, int default_orange) {
+    int i;
+    int accident, remain_time, total_time;
+    
+    if ((time(NULL) - traffic_time > default_time) || (traffic_time == -1)) {
+        int EW_Max, NS_Max;
+    
+        pthread_mutex_lock(&conn_mutex);
+
+        EW_Max = east.front + west.front;
+        NS_Max = north.front + south.front;
+
+        for (i = 0; i < NUM_OF_CLI; i++)
+            if (tls[i] != NULL)
+                writeTrafficLightInfo(tls[i]);
+
+        if ((time(NULL) - orange_time > default_orange) || (orange_time == -1)) {
+
+            switch (myswitch) {
+                case 0:
+                    //North South Green
+                    //East West Red
+
+                    green_light(&north);
+                    green_light(&south);
+                    red_light(&east);
+                    red_light(&west);
+                    if (EW_Max >= 2) {
+                        myswitch++;
+                        old_switch = myswitch;
+                        myswitch = 2;
+                    }
+                    break;
+
+                case 1:
+                    //North South Red
+                    //East West Green
+                    //없는쪽 신호시간
+                    default_time = 10;
+
+                    red_light(&north);
+                    red_light(&south);
+                    green_light(&east);
+                    green_light(&west);
+
+                    myswitch = 0;
+                    old_switch = myswitch;
+                    myswitch = 2;
+
+                    break;
+
+                case 2:
+                    // orange
+                    orange_light(&east);
+                    orange_light(&west);
+                    orange_light(&south);
+                    orange_light(&north);
+
+                    orange_time = time(NULL);
+                    myswitch = old_switch;
+
+                    if (default_time > 0)
+                        default_time = 0;
+
+                    //myswitch = oldswitch;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (calc_time < 0)
+            calc_time = 0;
+        else if (calc_time > 40)
+            calc_time = 40;
+
+        // 신호등 정보 저장
+        for (i = 0; i < NUM_OF_CLI; i++)
+            if (tls[i] != NULL)
+                writeTrafficLightInfo(tls[i]);
+
+        // 사고 여부 결정
+        accident = 0;
+        for (i = 0; i < NUM_OF_CLI; i++) {
+            if (tls[i] != NULL && tls[i]->accident == 1) {
+                accident = 1;
+                break;
+            }
+        }
+
+        pthread_mutex_unlock(&conn_mutex);
+        traffic_time = time(NULL);
+    }
+    if (default_time - (time(NULL) - traffic_time) < 0) {
+        remain_time = 0;
+        total_time = default_time;
+    } else {
+        remain_time = default_time - time(NULL) + traffic_time;
+        total_time = default_time;
+    }
+    printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n", remain_time, total_time);
+    writeGlobalInfo(accident, remain_time, total_time);
+}
+
+void test_detector(char *datacfg, char *cfgfile, char *weightfile, float thresh) {
     list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
     char **names = get_labels(name_list);
     image **alphabet = load_alphabet();
     network net = parse_network_cfg_custom(cfgfile, 1);
-
-    time_t current_time;
-    time_t traffic_time = -1;
-    time_t orange_time = -1;
-    int myswitch = 0;
-    int old_switch = 0;
-
-    int EW_Max;
-    int NS_Max;
-    int default_time = 20;
-    int default_orange = 5;
-    int calc_time = 0;
-    int accident = 0;
 
     if (weightfile) {
         load_weights(&net, weightfile);
@@ -1350,11 +1405,32 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile,
     set_batch_network(&net, 1);
     srand(2222222);
 
+    int testMode = 0; //0: normal, 1: night
+    
     // server on port "50000"
-    run_server("50000");
+    run_server(PORT);
 
     while (1) {
         int i;
+        time_t current_time;
+
+        if (kbhit()) {
+            if (getchar() == '1') {
+                testMode = !testMode;
+                if (testMode == 0) {
+                    printf("주간모드로 변경되었습니다.\n");
+                } else {
+                    printf("야간모드로 변경되었습니다.\n");
+                }
+                traffic_time = -1;
+                orange_time = -1;
+                myswitch = 0;
+                old_switch = 0;
+                calc_time = 0;
+                
+                sleep(2);
+            }
+        }
 
         // Request Images
 
@@ -1380,139 +1456,10 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile,
         // Traffic Algorithm
         current_time = time(NULL);
 
-
-        if ((time(NULL) - traffic_time > default_time + calc_time)
-                || (traffic_time == -1)) {
-
-            pthread_mutex_lock(&conn_mutex);
-
-            EW_Max = east.front + west.front;
-            NS_Max = north.front + south.front;
-
-            for (i = 0; i < NUM_OF_CLI; i++)
-                if (tls[i] != NULL)
-                    writeTrafficLightInfo(tls[i]);
-
-            //TODO 주황불 시간 결정
-            if ((time(NULL) - orange_time > default_orange)
-                    || (orange_time == -1)) {
-
-                switch (myswitch) {
-                    case 0:
-                        //North South Green
-                        //East West Red
-                        calc_time = 3 * (NS_Max - EW_Max);
-
-                        green_light(&north);
-                        green_light(&south);
-                        red_light(&east);
-                        red_light(&west);
-
-                        myswitch++;
-                        old_switch = myswitch;
-                        myswitch = 4;
-                        break;
-
-                    case 1:
-                        //North South Left Green
-                        //East West Red
-                        calc_time = 3 * (NS_Max - EW_Max);
-
-                        green_left_light(&north);
-                        green_left_light(&south);
-                        red_light(&east);
-                        red_light(&west);
-
-                        myswitch++;
-                        old_switch = myswitch;
-                        myswitch = 4;
-                        break;
-
-                    case 2:
-                        //North South Red
-                        //East West Green
-                        calc_time = 3 * (EW_Max - NS_Max);
-
-                        red_light(&north);
-                        red_light(&south);
-                        green_light(&east);
-                        green_light(&west);
-
-                        myswitch++;
-                        old_switch = myswitch;
-                        myswitch = 4;
-                        break;
-                    case 3:
-                        //North South Red
-                        //East West Left Green
-                        calc_time = 3 * (EW_Max - NS_Max);
-
-                        red_light(&north);
-                        red_light(&south);
-                        green_left_light(&east);
-                        green_left_light(&west);
-
-                        myswitch = 0;
-                        old_switch = myswitch;
-                        myswitch = 4;
-                        break;
-                    case 4:
-                        // orange
-                        orange_light(&east);
-                        orange_light(&west);
-                        orange_light(&south);
-                        orange_light(&north);
-
-                        orange_time = time(NULL);
-                        myswitch = old_switch;
-                        //myswitch = oldswitch;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (calc_time < -5)
-                calc_time = -5;
-            else if (calc_time > 10)
-                calc_time = 10;
-
-            // 신호등 정보 저장
-
-            for (i = 0; i < NUM_OF_CLI; i++)
-                if (tls[i] != NULL)
-                    writeTrafficLightInfo(tls[i]);
-
-            // 사고 여부 결정
-            accident = 0;
-            for (i = 0; i < NUM_OF_CLI; i++) {
-                if (tls[i] != NULL && tls[i]->accident == 1) {
-                    accident = 1;
-                    break;
-                }
-            }
-
-            if (myswitch == 4)
-                traffic_time = time(NULL);
-            pthread_mutex_unlock(&conn_mutex);
-        }
-        if (myswitch == 4) {
-            writeGlobalInfo(accident,
-                    (default_time + calc_time) - (time(NULL) - traffic_time),
-                    (default_time + calc_time));
-            printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n",
-                    default_time + calc_time - time(NULL) + traffic_time,
-                    default_time + calc_time);
-
-        } else {
-            writeGlobalInfo(accident,
-                    default_orange - (time(NULL) - orange_time),
-                    default_orange);
-            printf("[DETECT] 다음 신호까지 %d/%d 초 남았습니다.\n",
-                    default_orange - (time(NULL) - orange_time),
-                    default_orange);
-
-        }
-
+        if (testMode == 0)
+            traffic_normal_mode(20, 5);
+        else
+            traffic_night_mode(0, 3);
 
         printf("[DETECT] 신호등 신호 전달 완료 (%.2f 초)\n", time(NULL) - current_time);
         printf("------------------------------------------------\n");
@@ -1537,13 +1484,11 @@ void run_detector(int argc, char **argv) {
         printf("%s map [weights] //예측 정확도 테스트\n", argv[0]);
         printf("%s calc_anchor [weights] //yolo-obj.cfg에서 써야 할 anchor 값을 계산해줌\n", argv[0]);
         printf("%s test [weights] [section_num] //주간모드\n", argv[0]);
-        printf("%s test_night [weights] [section_num] //야간모드\n", argv[0]);
         return;
     }
-    if (strcmp(argv[1], "test") == 0 || strcmp(argv[1], "test_night") == 0) {
+    if (strcmp(argv[1], "test") == 0) {
         if (argc < 3) {
             printf("%s test [weights] [section_num] //주간모드\n", argv[0]);
-            printf("%s test_night [weights] [section_num] //야간모드\n", argv[0]);
             return;
         }
         strcpy(SERVER_ID, argv[3]);
@@ -1593,6 +1538,4 @@ void run_detector(int argc, char **argv) {
         calc_anchors(datacfg, num_of_clusters, final_width, final_heigh, show);
     else if (0 == strcmp(argv[1], "test"))
         test_detector(datacfg, cfg, weights, thresh);
-    else if (0 == strcmp(argv[1], "test_night"))
-        test_night_detector(datacfg, cfg, weights, thresh);
 }

@@ -2,6 +2,8 @@
 #define UTILS_H
 #include <stdio.h>
 #include <time.h>
+#include <termios.h>
+#include <fcntl.h>
 #include "list.h"
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -66,6 +68,7 @@ void print_statistics(float *a, int n);
 unsigned int random_gen();
 float random_float();
 float rand_uniform_strong(float min, float max);
+int kbhit(void);
 
 #endif
 

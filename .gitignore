@@ -18,6 +18,7 @@ cfg/
 darknet
 .fuse*
 darknet19_448.conv.23
+files/0/*.jpg
 
 
 # OS Generated #
