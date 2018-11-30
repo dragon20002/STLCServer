@@ -205,14 +205,6 @@ void* sig_handler(int signo) {
     int i;
     switch (signo) {
         case SIGINT:
-            for (i = 0; i < NUM_OF_LED; i++) {
-#ifdef PI
-				digitalWrite(leds[i], 0);
-#else
-				printf("%d is %d\n", leds[i], 0);
-#endif //PI
-			}
-
 			send_message(sock, "/exit", 5);
 			if (recv_message(sock, message) == 0 || strstr(message, "OK")) {
 				close(sock);
@@ -233,9 +225,17 @@ void error_handler(char * message) {
 }
 
 void set_red() {
+	for (i = 0; i < NUM_OF_LED; i++) {
 #ifdef PI
-				digitalWrite(leds[3], 1);
+		digitalWrite(leds[i], 0);
 #else
-				printf("%d is %d\n", leds[3], 1);
+		printf("%d is %d\n", leds[i], 0);
+#endif //PI
+	}
+
+#ifdef PI
+	digitalWrite(leds[3], 1);
+#else
+	printf("%d is %d\n", leds[3], 1);
 #endif //PI
 }
