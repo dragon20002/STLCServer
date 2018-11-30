@@ -202,7 +202,6 @@ int send_image(int sock, char* message) {
 }
 
 void* sig_handler(int signo) {
-    int i;
     switch (signo) {
         case SIGINT:
 			send_message(sock, "/exit", 5);
