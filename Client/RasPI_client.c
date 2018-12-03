@@ -94,7 +94,7 @@ void connection(int sock) {
 		
 #ifdef PI
 		// capture
-		sprintf(message, "raspistill -o %s.jpg -t 1 -w 416 -h 416 -rot 180", name);
+		sprintf(message, "raspistill -o %s.jpg -t 1 -w 416 -h 416 -rot 180 -q 10", name);
 		if (popen(message, "r") == NULL) {
 			fprintf(stderr, "fail to popen raspistill\n");
 			break;
@@ -122,7 +122,7 @@ void connection(int sock) {
 #endif //PI
 		}
 
-		sleep(1);
+		sleep(333);
 	}
 }
 
