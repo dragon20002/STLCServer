@@ -122,7 +122,7 @@ void connection(int sock) {
 #endif //PI
 		}
 
-		sleep(333);
+		sleep(3); //send image every 3 seconds
 	}
 }
 
