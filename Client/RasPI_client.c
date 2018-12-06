@@ -89,13 +89,15 @@ void connection(int sock) {
 
 	while (1) {
 		float milisec;
+		FILE* fp;
 
 		time = clock();
 		
 #ifdef PI
 		// capture
 		sprintf(message, "raspistill -o %s.jpg -t 1 -w 416 -h 416 -rot 180 -q 10", name);
-		if (popen(message, "r") == NULL) {
+		fp = popen(message, "r");
+		if (fp == NULL) {
 			fprintf(stderr, "fail to popen raspistill\n");
 			break;
 		}
@@ -121,6 +123,8 @@ void connection(int sock) {
 			printf("%d is %d\n", leds[i], isOn[i]);
 #endif //PI
 		}
+
+		pclose(fp);
 
 		sleep(3); //send image every 3 seconds
 	}

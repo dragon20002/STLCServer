@@ -1,0 +1,20 @@
+sudo vi /etc/wpa_supplicant/wpa_supplicant.conf
+
+///////////////////////////////////////////////////////////////////////
+
+	ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+	update_config=1
+
+	network={
+		ssid="aaaa"
+		psk="bbbb"
+	}
+
+///////////////////////////////////////////////////////////////////////
+
+sudo /etc/init.d/networking restart
+
+
+
+
+for ((;;)) do ifconfig; sleep 1; done;
