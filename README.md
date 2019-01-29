@@ -1,4 +1,4 @@
-#학습 전 설정
+# 학습 전 설정
   1. 데이터 위치 설정
     data/img/*
     data/obj.data
@@ -20,13 +20,13 @@
     -clear (0)
 
 
-#학습
+# 학습
 ./darknet train darknet19_448.conv.23
 
 ./darknet train backup/yolo-obj.backup > log/log_xxxx_yymmdd.txt
 
 
-#검증
+# 검증
   1. imagenet test<br>
     ./darknet valid backup/yolo-obj_1500.weights
 
@@ -37,15 +37,15 @@
     ./darknet map backup/yolo-obj_1500.weights
 
 
-#실행
+# 실행
 ./darknet test backup/yolo-obj_5200.weights 0
 
 
-#실행결과 이미지 위치
+# 실행결과 이미지 위치
     data/result/*
 
 
-#상황 인지 교통 신호등 제어방법 (src_desc/server.c)
+# 상황 인지 교통 신호등 제어방법 (src_desc/server.c)
 ```
 493 Line : test_detector
 
