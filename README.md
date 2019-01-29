@@ -1,54 +1,48 @@
 # 학습 전 설정
-  1. 데이터 위치 설정
-    data/img/*
-    data/obj.data
-    data/obj.names
-    data/train.txt
-    data/test.txt
+1. 데이터 위치 설정
+> data/img/*<br>
+> data/obj.data<br>
+> data/obj.names<br>
+> data/train.txt<br>
+> data/test.txt
 
-  2. yolo-obj.cfg 수정
-    1) anchor 설정
-      ./darknet calc_anchors
+2. yolo-obj.cfg 수정
+- anchor 설정
+> $ ./darknet calc_anchors
 
-  3. darknet 옵션 목록 (기본값)
-    -show (0)		: calc_anchor 모드에서 결과이미지를 봄
-    -thresh (24)	: 낮을 수록 사소한 물체도 결과로 표시함
-    -num_of_clusters (5): calc_anchor 모드
-    -final_width (13)	: calc_anchor 모드
-    -final_height (13)	: calc_anchor 모드
-    -gpus (0)
-    -clear (0)
-
+3. darknet 옵션 목록 (기본값)
+- show (0)		: calc_anchor 모드에서 결과이미지를 봄
+- thresh (24)	: 낮을 수록 사소한 물체도 결과로 표시함
+- num_of_clusters (5): calc_anchor 모드
+- final_width (13)	: calc_anchor 모드
+- final_height (13)	: calc_anchor 모드
+- gpus (0)
+- clear (0)
 
 # 학습
-./darknet train darknet19_448.conv.23
+> $ ./darknet train darknet19_448.conv.23
 
-./darknet train backup/yolo-obj.backup > log/log_xxxx_yymmdd.txt
-
+> $ ./darknet train backup/yolo-obj.backup > log/log_xxxx_yymmdd.txt
 
 # 검증
-  1. imagenet test<br>
-    ./darknet valid backup/yolo-obj_1500.weights
+1. imagenet test<br>
+> $ ./darknet valid backup/yolo-obj_1500.weights
 
-  2. 학습로그???<br>
-    ./darknet recall backup/yolo-obj_1500.weights
+2. 학습로그???<br>
+> $ ./darknet recall backup/yolo-obj_1500.weights
 
-  3. mAP 측정<br>
-    ./darknet map backup/yolo-obj_1500.weights
-
+3. mAP 측정<br>
+> $ ./darknet map backup/yolo-obj_1500.weights
 
 # 실행
-./darknet test backup/yolo-obj_5200.weights 0
-
+> $ ./darknet test backup/yolo-obj_5200.weights 0
 
 # 실행결과 이미지 위치
-    data/result/*
-
+> data/result/*
 
 # 상황 인지 교통 신호등 제어방법 (src_desc/server.c)
 ```
 493 Line : test_detector
-
 
 1. 클라이언트로부터 받은 이미지 분석
 
