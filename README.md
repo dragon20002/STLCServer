@@ -76,3 +76,7 @@ EW_Max (동-서로 이동하는 차량 수), NS_Max (남-북으로 이동하는 
 
 340 Line : 사고여부는 1 에서 이미지 분석할 때 동/서/남/북 중 하나 이상의 이미지에서 사고가 인식되면 웹서버로 사고 사실을 보낸다.
 ```
+
+# 프로젝트 관련 링크
+- [웹 서버 소스](https://github.com/dragon20002/STLCWebServer)
+- [시연영상](https://youtu.be/lfkUsUylsjE)
